@@ -1,10 +1,10 @@
 /**
  * Brian Chung - Mon, April 13, 2020
  * Using Cloudflare workers, this application will randomly respond
- * with one of two variant webpages provided by CloudFlare's api/variant
+ * with one of two variant webpages provided by Cloudflare's api/variant
  **/
 
-// URL to CloudFlare API to recieve URLs to variants
+// URL to Cloudflare API to recieve URLs to variants
 const VARIANT_API = "https://cfw-takehome.developers.workers.dev/api/variants";
 
 const COOKIE_NAME = "variant-id";
@@ -19,7 +19,7 @@ addEventListener("fetch", event => {
  * @param {Request} request
  */
 async function handleRequest(request) {
-  variantURLs = await (await fetch(VARIANT_API)).json(); // Fetch CloudFlare api/variants JSON
+  variantURLs = await (await fetch(VARIANT_API)).json(); // Fetch Cloudflare api/variants JSON
   const cookie = parseInt(getCookie(request, COOKIE_NAME)); //Get cookie (variant-id)
 
   //* If cookie is valid (0, 1), rewrite variant *
