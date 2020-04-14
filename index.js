@@ -1,7 +1,7 @@
 /**
  * Brian Chung - Mon, April 13, 2020
  * Using Cloudflare workers, this application will randomly respond
- * with one of two varient webpages provided by CloudFlare's api/variant
+ * with one of two variant webpages provided by CloudFlare's api/variant
  **/
 
 // URL to CloudFlare API to recieve URLs to variants
@@ -20,13 +20,39 @@ addEventListener("fetch", event => {
 async function handleRequest(request) {
   //Fetch CloudFlare api/variants and parse JSON
   variantURLs = await (await fetch(variantURLAPI)).json();
+
+  const cookie = getCookie(request, "variant-id");
+  if (cookie) {
+    variantNumber = cookie;
+    randChosenVariantURL = variantURLs.variants[variantNumber];
+    //Fetch variant HTML Response given random variant URL
+    response = await fetch(randChosenVariantURL);
+    //Return modified variant using HTMLRewriter
+    return variantRewriter.transform(response);
+  }
   //Since Math.random() generates a random float between 0 and 1, round to nearest int to get random index
   variantNumber = Math.round(Math.random());
   randChosenVariantURL = variantURLs.variants[variantNumber];
   //Fetch variant HTML Response given random variant URL
-  variantHTML = await fetch(randChosenVariantURL);
+  response = await fetch(randChosenVariantURL);
+
+  const transformedHTML = variantRewriter.transform(response);
+
+  const today = new Date();
+  const nextWeek = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+
   //Return modified variant using HTMLRewriter
-  return variantRewriter.transform(variantHTML);
+  return new Response(await transformedHTML.text(), {
+    headers: {
+      "Set-Cookie": "variant-id=".concat(
+        variantNumber,
+        "; Expires=",
+        nextWeek.toUTCString(),
+        ";"
+      ),
+      "content-type": "text/html"
+    }
+  });
 }
 
 //Changes the Title of the Webpage
@@ -91,3 +117,24 @@ const variantRewriter = new HTMLRewriter()
   .on("p#description", new DescriptionHandler())
   .on("a#url", new ButtonHandler())
   .on("svg", new SVGHandler());
+
+/**
+ * Grabs the cookie with name from the request headers
+ * @param {Request} request incoming Request
+ * @param {string} name of the cookie to grab
+ */
+function getCookie(request, name) {
+  let result = null;
+  let cookieString = request.headers.get("Cookie");
+  if (cookieString) {
+    let cookies = cookieString.split(";");
+    cookies.forEach(cookie => {
+      let cookieName = cookie.split("=")[0].trim();
+      if (cookieName === name) {
+        let cookieVal = cookie.split("=")[1];
+        result = cookieVal;
+      }
+    });
+  }
+  return result;
+}
