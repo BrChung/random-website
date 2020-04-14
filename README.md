@@ -2,7 +2,7 @@
 
 ## What is it?
 
-Using Cloudflare Workers, this application will randomly send users to one of two webpages. This project utilizes Cloudflare Workers API and is deployed on a [domain](https://random.brianchung.co).
+Using Cloudflare Workers, this application will randomly send users to one of two webpages. This project utilizes Cloudflare Workers API and is deployed on a [domain](http://random.brianchung.co).
 
 ### What does it do?
 
@@ -10,7 +10,7 @@ Using Cloudflare Workers, this application will randomly send users to one of tw
 2. Requests a random variant and modifies the HTML with [HTMLRewriter](https://developers.cloudflare.com/workers/reference/apis/html-rewriter/), an API build into the Workers runtime.
 3. Persists varaints when a user fetches the website. A cookie is set so that the user will get the same variant for the next 24 hours.
 
-To check it out, the website is deployed on the free worker's [subdomain](https://fullstack-intern-challenge.random-website.workers.dev/) as well as on my [personal website](https://random.brianchung.co).
+To check it out, the website is deployed on the free worker's [subdomain](https://fullstack-intern-challenge.random-website.workers.dev/) as well as on my [personal website](http://random.brianchung.co).
 
 ## Getting Started
 
